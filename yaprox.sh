@@ -1,5 +1,5 @@
 function yaprox() {
-    local usage proxy_user proxy_server proxy_pwd
+    local usage proxy_user proxy_server proxy_pwd proxy_url
 
     usage="yaprox sets your http_proxy and https_proxy environment variables
 
@@ -20,8 +20,8 @@ duration of the session."
                 ;;
             c)
                 echo "http_proxy and https_proxy cleared."
-                unset http_proxy
-                unset https_proxy
+                unset http_proxy HTTP_PROXY
+                unset https_proxy HTTPS_PROXY
                 return
         esac
     done
@@ -37,9 +37,12 @@ duration of the session."
     echo -n "Enter password: "
     read -s proxy_pwd
 
+    proxy_url=$proxy_user:$proxy_pwd@$proxy_server
     # git seems to work best with lower case environment variable names
-    export http_proxy=$proxy_user:$proxy_pwd@$proxy_server
-    export https_proxy=$proxy_user:$proxy_pwd@$proxy_server
+    export http_proxy=$proxy_url
+    export HTTP_PROXY=$proxy_url
+    export https_proxy=$proxy_url
+    export HTTPS_proxy=$proxy_url
 
     echo "\nNow using $proxy_server."
 }
