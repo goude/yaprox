@@ -24,4 +24,4 @@ yaprox sets your HTTP_PROXY and HTTPS_PROXY environment variables
     http_proxy=user:acererak@proxy.company.com:8080
     HTTP_PROXY=user:acererak@proxy.company.com:8080
     https_proxy=user:acererak@proxy.company.com:8080
-    HTTPS_proxy=user:acererak@proxy.company.com:8080
+    HTTPS_PROXY=user:acererak@proxy.company.com:8080
