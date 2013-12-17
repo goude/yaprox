@@ -42,7 +42,7 @@ duration of the session."
     export http_proxy=$proxy_url
     export HTTP_PROXY=$proxy_url
     export https_proxy=$proxy_url
-    export HTTPS_proxy=$proxy_url
+    export HTTPS_PROXY=$proxy_url
 
     echo "\nNow using $proxy_server."
 }
