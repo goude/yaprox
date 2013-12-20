@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+# Based on https://github.com/andsens/homeshick
+
+export SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+KEEP_PATH=false
+test_suites=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h | --help)
+            printf "Run yaprox unit tests\n"
+            printf " Usage: run [options] [SUITES..]\n"
+            printf " Options:\n"
+            printf "   -p, --keep-path   # Prevent \$PATH modifications\n"
+            exit 0
+      ;;
+        -p | --keep-path) KEEP_PATH=true; shift; continue ;;
+        *)
+            if [[ $1 =~ ^- ]]; then
+                printf "Unknown option '$1'\n" >&2
+                exit 64 # 64=$EX_USAGE
+            fi
+            test_suites+=($1)
+            shift; continue ;;
+    esac
+done
+
+if [[ ! -x $SHUNIT2 ]]; then
+    if [[ ! -x $SCRIPTDIR/shunit2-2.1.6/src/shunit2 ]]; then
+        printf "shunit2 not found. You can set its path with \`export SHUNIT2=/path/to/shunit2/src/shunit2'.\n"
+        printf "Alternatively the testrunner can download it automatically now.\n"
+        read -p "Download? [yN]" prompt
+        if [[ ! $prompt =~ [Yy] ]]; then
+            exit 78 # 78=$EX_CONFIG
+        fi
+        type wget >/dev/null 2>&1
+        if [[ $? = 0 ]]; then
+            wget -qO - https://shunit2.googlecode.com/files/shunit2-2.1.6.tgz | tar -xzC $SCRIPTDIR
+        else
+            curl -s https://shunit2.googlecode.com/files/shunit2-2.1.6.tgz | tar -xzC $SCRIPTDIR
+        fi
+    fi
+    export SHUNIT2=$SCRIPTDIR/shunit2-2.1.6/src/shunit2
+fi
+
+if [[ ! -f $SHUNIT2 ]]; then
+    printf "File not found. \$SHUNIT2 points at \`%s'.\n" $SHUNIT2 >&2
+    exit 1
+fi
+
+# Check if expect is installed
+type expect >/dev/null 2>&1
+if [[ $? != 0 ]]; then
+    export EXPECT_INSTALLED=false
+    printf "\`expect' executable not found. Skipping all tests using expect.\n"
+else
+    export EXPECT_INSTALLED=true
+fi
+
+set +e
+
+exit_status=0
+if [[ -z "$test_suites" ]]; then
+        test_suites=()
+        for file in $SCRIPTDIR/suites/*.sh; do
+                test_suites+=($(basename $file .sh))
+        done
+fi
+
+output=""
+for test_suite in ${test_suites[*]}; do
+        printf "\nTestsuite: $test_suite\n"
+        output="$output\n\nTestsuite: $test_suite"
+        tests_done=false
+        while IFS= read -d $'\n' -r line ; do
+                printf "$line\n"
+                if $tests_done; then
+                        if [[ -n $line ]]; then
+                                result=0
+                                [[ $line =~ "FAILED" ]] && result=1
+                                output="$output\n$line"
+                        fi
+                fi
+                if [[ -z $line ]]; then
+                        tests_done=true
+                fi
+        done < <(bash $SCRIPTDIR/suites/$test_suite.sh)
+        if [[ $exit_status == 0 && $result != 0 ]]; then
+                exit_status=$result
+        fi
+done
+printf -- "--------\nRESULTS:$output\n"
+exit $exit_status
