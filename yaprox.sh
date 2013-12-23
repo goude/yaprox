@@ -1,7 +1,5 @@
-function yaprox() {
-    local usage proxy_user proxy_server proxy_pwd proxy_url
-
-    usage="yaprox sets your http_proxy and https_proxy environment variables
+function yaprox_help() {
+    printf "yaprox sets your http_proxy and https_proxy environment variables
 
  Usage: yaprox USER SERVER
 
@@ -10,12 +8,17 @@ function yaprox() {
   -c        # Unset http_proxy and https_proxy
 
 WARNING: use wisely, the environment will store your plaintext password for the
-duration of the session."
+duration of the session.
+"
 
+}
+
+function yaprox() {
+    local proxy_user proxy_server proxy_pwd proxy_url
     while getopts ":h:c" opt; do
         case $opt in
             h)
-                echo $USAGE >&2
+                yaprox_help
                 return
                 ;;
             c)
@@ -27,7 +30,7 @@ duration of the session."
     done
 
     if [[ "$#" -ne 2 ]]; then
-        echo $usage
+        yaprox_help
         return
     fi 
 
