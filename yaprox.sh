@@ -47,5 +47,6 @@ function yaprox() {
     export https_proxy=$proxy_url
     export HTTPS_PROXY=$proxy_url
 
-    echo "\nNow using $proxy_server."
+    echo
+    echo "Now using proxy server $proxy_server. Run yaprox -c when done to unset."
 }
