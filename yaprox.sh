@@ -1,15 +1,22 @@
-function yaprox_help() {
-    printf "yaprox sets your http_proxy and https_proxy environment variables
+# Yaprox uses code from https://github.com/andsens/homeshick
 
- Usage: yaprox USER SERVER
+function yaprox_help() {
+    printf "yaprox sets your http_proxy and https_proxy environment variables.
+
+ Usage: yaprox [options] USER SERVER
 
  Runtime options:
   -c, [--clear]     # Unset http_proxy and https_proxy
   -q, [--quiet]     # Quiet mode
   -h, [--help]      # Display this help and exit
 
-WARNING: use wisely, the environment will store your plaintext password for the
-duration of the session.
+ Note:
+  If you wish to specify a domain USER, use the format <domain>\\\\\\<user>
+  (note the double backslash).
+
+ Warning:
+  Use wisely, the environment will store your plaintext password for
+  the duration of the session.
 "
 
 }
@@ -57,7 +64,7 @@ function yaprox() {
     proxy_user=$1
     proxy_server=$2
 
-    echo -n "Enter password: "
+    echo -n "Enter password for $proxy_user@$proxy_server: "
     read -s proxy_pwd
 
     proxy_url=$proxy_user:$proxy_pwd@$proxy_server
@@ -69,7 +76,7 @@ function yaprox() {
 
     if $TALK; then
       echo
-      echo "Now using proxy server $proxy_server. Run yaprox -c when done to unset."
+      echo "Now using proxy server $proxy_server. Run yaprox --clear when done to unset."
     fi
 }
 
