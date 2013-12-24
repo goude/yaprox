@@ -4,8 +4,9 @@ function yaprox_help() {
  Usage: yaprox USER SERVER
 
  Runtime options:
-  -h        # Display this help and exit
-  -c        # Unset http_proxy and https_proxy
+  -c, [--clear]     # Unset http_proxy and https_proxy
+  -q, [--quiet]     # Quiet mode
+  -h, [--help]      # Display this help and exit
 
 WARNING: use wisely, the environment will store your plaintext password for the
 duration of the session.
@@ -15,18 +16,37 @@ duration of the session.
 
 function yaprox() {
     local proxy_user proxy_server proxy_pwd proxy_url
-    while getopts ":h:c" opt; do
-        case $opt in
-            h)
-                yaprox_help
-                return
-                ;;
-            c)
-                echo "http_proxy and https_proxy cleared."
-                unset http_proxy HTTP_PROXY
-                unset https_proxy HTTPS_PROXY
-                return
-        esac
+    local TALK=true
+
+    # Option parsing from andsens/homeshick
+    while [[ $# -gt 0 ]]; do
+        if [[ $1 =~ ^- ]]; then
+            # Convert combined short options into multiples short options (e.g. `-qb' to `-q -b')
+            if [[ $1 =~ ^-[a-z]{2,} ]]; then
+                param=$1
+                shift
+                set -- ${param:0:2} -${param:2} $@
+                unset param
+            fi
+            case $1 in
+                -h | --help)  yaprox_help ; return ;;
+                -q | --quiet) TALK=false ; shift; continue ;;
+                -c | --clear)
+                    unset http_proxy
+                    unset HTTP_PROXY
+                    unset https_proxy
+                    unset HTTPS_PROXY
+                    echo "Proxy variables cleared."
+                    return
+                    ;;
+                *)  
+                    echo "Unknown option '$1'"
+                    return 1
+                    ;;
+            esac
+        else
+            break
+        fi
     done
 
     if [[ "$#" -ne 2 ]]; then
@@ -47,6 +67,9 @@ function yaprox() {
     export https_proxy=$proxy_url
     export HTTPS_PROXY=$proxy_url
 
-    echo
-    echo "Now using proxy server $proxy_server. Run yaprox -c when done to unset."
+    if $TALK; then
+      echo
+      echo "Now using proxy server $proxy_server. Run yaprox -c when done to unset."
+    fi
 }
+
