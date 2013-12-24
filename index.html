@@ -34,23 +34,45 @@
         <h1>
 <a name="yaprox" class="anchor" href="#yaprox"><span class="octicon octicon-link"></span></a>yaprox</h1>
 
-<p>yaprox sets your HTTP_PROXY and HTTPS_PROXY environment variables</p>
+<p>yaprox sets your HTTP_PROXY and HTTPS_PROXY environment variables, prompting
+for a password.</p>
 
-<pre><code>$ git clone https://github.com/goude/yaprox.git
-$ source yaprox/yaprox.sh
+<p>This avoids tainting your history with passwords and having to
+store login credentials in a plain text file.</p>
+
+<p>curl, wget, git and other tools will respect these proxy variables, so you
+can get on with your work.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Download <a href="https://raw.github.com/goude/yaprox/master/yaprox.sh">https://raw.github.com/goude/yaprox/master/yaprox.sh</a> with your web
+browser or equivalent proxy-enabled program.</p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<pre><code>$ source yaprox.sh
 $ yaprox
+yaprox sets your http_proxy and https_proxy environment variables.
 
-Usage: yaprox USER SERVER
+Usage: yaprox [options] USER SERVER
 
- Runtime options:
-  -h        # Display this help and exit
-  -c        # Unset http_proxy and https_proxy
+Runtime options:
+  -c, [--clear]     # Unset http_proxy and https_proxy
+  -q, [--quiet]     # Quiet mode
+  -h, [--help]      # Display this help and exit
 
-WARNING: use wisely, the environment will store your plaintext password for the
-duration of the session.
+Note:
+  If you wish to specify a domain USER, use the format &lt;domain&gt;\\&lt;user&gt;
+  (note the double backslash).
+
+Warning:
+  Use wisely, the environment will store your plaintext password for
+  the duration of the session.
 
 $ yaprox user proxy.company.com:8080
-Enter password:
+Enter password for user@proxy.company.com:
 Now using proxy.company.com:8080.
 
 $ env | grep -i http
