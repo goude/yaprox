@@ -18,7 +18,7 @@ browser or equivalent proxy-enabled program.
     $ yaprox
     yaprox sets your http_proxy and https_proxy environment variables.
 
-    Usage: yaprox [options] USER SERVER
+    Usage: yaprox [options] [user] server
 
     Runtime options:
       -c, [--clear]     # Unset http_proxy and https_proxy
@@ -42,3 +42,5 @@ browser or equivalent proxy-enabled program.
     HTTP_PROXY=user:acererak@proxy.company.com:8080
     https_proxy=user:acererak@proxy.company.com:8080
     HTTPS_PROXY=user:acererak@proxy.company.com:8080
+
+    $ yaprox -q localhost:3128 # cntlm

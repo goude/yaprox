@@ -3,7 +3,7 @@
 function yaprox_help() {
     printf "yaprox sets your http_proxy and https_proxy environment variables.
 
- Usage: yaprox [options] USER SERVER
+ Usage: yaprox [options] [user] server
 
  Runtime options:
   -c, [--clear]     # Unset http_proxy and https_proxy
@@ -46,7 +46,7 @@ function yaprox() {
                     echo "Proxy variables cleared."
                     return
                     ;;
-                *)  
+                *)
                     echo "Unknown option '$1'"
                     return 1
                     ;;
@@ -56,18 +56,20 @@ function yaprox() {
         fi
     done
 
-    if [[ "$#" -ne 2 ]]; then
+    if [[ "$#" -eq 2 ]]; then
+        proxy_user=$1
+        proxy_server=$2
+        echo -n "Enter password for $proxy_user@$proxy_server: "
+        read -s proxy_pwd
+        proxy_url=$proxy_user:$proxy_pwd@$proxy_server
+    elif [[ "$#" -eq 1 ]]; then
+        proxy_server=$1
+        proxy_url=$proxy_server
+    else
         yaprox_help
         return
-    fi 
+    fi
 
-    proxy_user=$1
-    proxy_server=$2
-
-    echo -n "Enter password for $proxy_user@$proxy_server: "
-    read -s proxy_pwd
-
-    proxy_url=$proxy_user:$proxy_pwd@$proxy_server
     # git seems to work best with lower case environment variable names
     export http_proxy=$proxy_url
     export HTTP_PROXY=$proxy_url
