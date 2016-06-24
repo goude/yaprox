@@ -9,6 +9,9 @@ function yaprox_help() {
   -c, [--clear]     # Unset http_proxy and https_proxy
   -q, [--quiet]     # Quiet mode
   -h, [--help]      # Display this help and exit
+  -l, [--list]      # Show relevant environment variables
+  -s, [--stash]     # Unset proxy variables, but save for later use in a temporary environment variable
+  -u, [--unstash]   # Set proxy variables using stashed value; clear temporary environment variable
 
  Note:
   If you wish to specify a domain USER, use the format <domain>\\\\\\<user>
@@ -16,9 +19,17 @@ function yaprox_help() {
 
  Warning:
   Use wisely, the environment will store your plaintext password for
-  the duration of the session.
+  the duration of the session. Always inspect the source code when you download
+  something from the internet, including this script.
 "
 
+}
+
+function _yaprox_clear() {
+    unset http_proxy
+    unset HTTP_PROXY
+    unset https_proxy
+    unset HTTPS_PROXY
 }
 
 function yaprox() {
@@ -38,12 +49,32 @@ function yaprox() {
             case $1 in
                 -h | --help)  yaprox_help ; return ;;
                 -q | --quiet) TALK=false ; shift; continue ;;
+                -l | --list)
+                    env | grep -i prox
+                    return
+                    ;;
                 -c | --clear)
-                    unset http_proxy
-                    unset HTTP_PROXY
-                    unset https_proxy
-                    unset HTTPS_PROXY
-                    echo "Proxy variables cleared."
+                    _yaprox_clear
+                    unset _yaprox_stash
+                    if $TALK; then
+                        echo "Proxy variables cleared."
+                    fi
+                    return
+                    ;;
+                -s | --stash)
+                    export _yaprox_stash=$http_proxy
+                    _yaprox_clear
+                    if $TALK; then
+                        echo "Proxy variables stashed."
+                    fi
+                    return
+                    ;;
+                -u | --unstash)
+                    yaprox -q $_yaprox_stash
+                    unset _yaprox_stash
+                    if $TALK; then
+                        echo "Proxy variables unstashed."
+                    fi
                     return
                     ;;
                 *)
