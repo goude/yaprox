@@ -5,6 +5,8 @@ function yaprox_help() {
 
  Usage: yaprox [options] [user] server
 
+ (if server is a number N, use line N from ~/.yaproxrc)
+
  Runtime options:
   -c, [--clear]     # Unset http_proxy and https_proxy
   -q, [--quiet]     # Quiet mode
@@ -94,8 +96,12 @@ function yaprox() {
         read -s proxy_pwd
         proxy_url=$proxy_user:$proxy_pwd@$proxy_server
     elif [[ "$#" -eq 1 ]]; then
-        proxy_server=$1
-        proxy_url=$proxy_server
+        if [[ "$1" =~ ^[1-9]$ ]]; then
+          proxy_server=$(sed "$1q;d" ~/.yaproxrc)
+        else
+          proxy_server=$1
+          proxy_url=$proxy_server
+        fi
     else
         yaprox_help
         return
