@@ -100,8 +100,8 @@ function yaprox() {
           proxy_server=$(sed "$1q;d" ~/.yaproxrc)
         else
           proxy_server=$1
-          proxy_url=$proxy_server
         fi
+        proxy_url=$proxy_server
     else
         yaprox_help
         return
