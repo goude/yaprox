@@ -119,3 +119,10 @@ function yaprox() {
     fi
 }
 
+# EXPERIMENTAL - execute a single command using the preferred proxy,
+# which we define to be the first one listed in .yaproxrc
+function yap() {
+    proxy_server=$(sed "1q;d" ~/.yaproxrc)
+    http_proxy=$proxy_server https_proxy=$proxy_server $@
+}
+
