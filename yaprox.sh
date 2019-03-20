@@ -32,6 +32,8 @@ function _yaprox_clear() {
     unset HTTP_PROXY
     unset https_proxy
     unset HTTPS_PROXY
+    unset NO_PROXY
+    unset no_proxy
 }
 
 function yaprox() {
